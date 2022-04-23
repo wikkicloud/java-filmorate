@@ -15,7 +15,7 @@ import java.util.*;
 public class FilmController {
 
     private static final int MAX_SIZE_DESCRIPTION = 200;
-    private static final LocalDate MIN_DATE_RELEASE = LocalDate.of(1985, Month.DECEMBER, 28);
+    private static final LocalDate MIN_DATE_RELEASE = LocalDate.of(1895, Month.DECEMBER, 28);
     private final Map<Integer, Film> films = new HashMap<>();
     private Integer id = 1;
 
