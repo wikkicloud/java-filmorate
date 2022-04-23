@@ -46,4 +46,14 @@ class UserControllerTest {
                 LocalDate.of(2023, Month.MAY,3));
         assertThrows(ValidationException.class, () -> userController.validate(user));
     }
+
+    @Test
+    void shouldValidationExceptionWrongEmailFormat() {
+        User user = new User("test.test.ru", "login", "name",
+                LocalDate.of(2023, Month.MAY,3));
+        User userBlankEmail = new User("", "login", "name",
+                LocalDate.of(2023, Month.MAY,3));
+        assertThrows(ValidationException.class, () -> userController.validate(user));
+        assertThrows(ValidationException.class, () -> userController.validate(userBlankEmail));
+    }
 }

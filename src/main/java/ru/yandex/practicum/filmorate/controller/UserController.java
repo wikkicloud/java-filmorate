@@ -36,8 +36,8 @@ public class UserController {
 
     @PutMapping
     public User update(@RequestBody User user) {
-        validate(user);
         if (user.getId() == null || !users.containsKey(user.getId())) {
+            validate(user);
             log.error("Неизвестный или пустой user id: {}", user.getId());
             throw new ValidationException("Неизвестный или пустой user id: " + user.getId());
         }
@@ -55,8 +55,13 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            log.error("Ошибка формата email '{}'", user.getEmail());
+            throw new ValidationException("Ошибка формата email");
+        }
+
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Ошибка даты рождения {}", user.getBirthday());
+            log.error("Ошибка даты рождения '{}'", user.getBirthday());
             throw new ValidationException("Ошибка в поле дата рождения");
         }
     }

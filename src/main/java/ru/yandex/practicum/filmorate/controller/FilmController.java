@@ -39,8 +39,8 @@ public class FilmController {
 
     @PutMapping
     public Film update(@RequestBody Film film) {
-        validate(film);
         if (film.getId() == null || !films.containsKey(film.getId())) {
+            validate(film);
             log.error("Неизвестный или пустой film id: {}", film.getId());
             throw new ValidationException("Неизвестный или пустой id: " + film.getId());
         }
