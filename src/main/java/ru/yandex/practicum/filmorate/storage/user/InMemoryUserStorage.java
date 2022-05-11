@@ -13,10 +13,10 @@ import java.util.Map;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private final Map<Integer, User> users = new HashMap<>();
-    private static Integer globalId = 1;
+    private final Map<Long, User> users = new HashMap<>();
+    private static Long globalId = 1L;
 
-    private static Integer getNextId() {
+    private static Long getNextId() {
         return globalId++;
     }
 
@@ -40,12 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void remove(Integer id) {
-
-    }
-
-    @Override
-    public User getByID(Integer id) {
+    public User getByID(Long id) {
         return users.get(id);
     }
 }

@@ -21,7 +21,7 @@ class FilmControllerTest {
     @Test
     void shouldValidationExceptionIsNameBlank() {
         Film film = new Film("", "Описание",
-                LocalDate.of(2001, Month.JANUARY, 2), Duration.ofMinutes(90));
+                LocalDate.of(2001, Month.JANUARY, 2),90L);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
     @Test
@@ -30,21 +30,28 @@ class FilmControllerTest {
                 " что вызвать сильную скорбь и грусть гораздо сложнее чем улыбку. Для этого нужно проделать большую" +
                 " работу над персонажам";
         Film film = new Film("Фильм", desc201,
-                LocalDate.of(2001, Month.JANUARY, 2), Duration.ofMinutes(90));
+                LocalDate.of(2001, Month.JANUARY, 2), 90L);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 
     @Test
     void shouldValidationExceptionIsReleaseDateBeforeMinDateRelease() {
         Film film = new Film("Фильм", "Описание",
-                LocalDate.of(1895, Month.DECEMBER, 27), Duration.ofMinutes(90));
+                LocalDate.of(1895, Month.DECEMBER, 27), 90L);
+        assertThrows(ValidationException.class, () -> filmService.validate(film));
+    }
+
+    @Test
+    void shouldValidationExceptionDescriptionIsBlank() {
+        Film film = new Film("Фильм", "",
+                LocalDate.of(1895, Month.DECEMBER, 27), 90L);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 
     @Test
     void shouldValidationExceptionIsDuration0() {
         Film film = new Film("Фильм", "Описание",
-                LocalDate.of(2001, Month.DECEMBER, 27), Duration.ofSeconds(0));
+                LocalDate.of(2001, Month.DECEMBER, 27), 0L);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 

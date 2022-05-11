@@ -13,16 +13,16 @@ import java.util.Map;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private final Map<Integer, Film> films = new HashMap<>();
-    private static Integer globalId = 1;
+    private final Map<Long, Film> films = new HashMap<>();
+    private static Long globalId = 1L;
 
-    private static Integer generateId() {
+    private static Long getNextId() {
         return globalId++;
     }
 
     @Override
     public Film create(Film film) {
-        film.setId(generateId());
+        film.setId(getNextId());
         films.put(film.getId(), film);
         log.info("Добавлен фильм {}", films.get(film.getId()));
         return films.get(film.getId());
@@ -40,12 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getByID(Integer id) {
+    public Film getByID(Long id) {
         return films.get(id);
-    }
-
-    @Override
-    public void remove(Integer id) {
-
     }
 }

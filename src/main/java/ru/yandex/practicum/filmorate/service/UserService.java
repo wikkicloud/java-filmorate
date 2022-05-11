@@ -3,14 +3,16 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,7 +21,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(InMemoryUserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -33,12 +35,80 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (user.getId() == null || userStorage.getByID(user.getId()) == null) {
-            log.error("Неизвестный или пустой user id: {}", user.getId());
-            throw new ValidationException(String.format("Неизвестный или пустой user id: %s", user.getId()));
-        }
+        if (userStorage.getByID(user.getId()) == null)
+            throw new UserNotFoundException(user.getId());
         validate(user);
         return userStorage.update(user);
+    }
+
+    public User getById(Long id) {
+        User user = userStorage.getByID(id);
+        if (user == null)
+            throw new FilmNotFoundException(id);
+        return user;
+    }
+
+    public User addFriend(Long userId, Long friendId) {
+        User user = userStorage.getByID(userId);
+        User userAdded = userStorage.getByID(friendId);
+
+        if (user == null)
+            throw new UserNotFoundException(userId);
+        if (userAdded == null)
+            throw new UserNotFoundException(friendId);
+        //Если удалось добавить обновим список друзей
+        if (user.getFriends().add(friendId)) {
+            log.info("user id: {} add friend user id: {}", userId, friendId);
+            //Обновим список друзей и у добавляемого друга
+            userAdded.getFriends().add(userId);
+            log.info("user id: {} add friend user id: {}", friendId, userId);
+        }
+        return user;
+    }
+
+    public User removeFriend(Long userId, Long friendId) {
+        User user = userStorage.getByID(userId);
+        User userRemoved = userStorage.getByID(friendId);
+
+        if (user == null)
+            throw new UserNotFoundException(userId);
+        if (userRemoved == null)
+            throw new UserNotFoundException(friendId);
+
+        if (user.getFriends().remove(friendId)) {
+            log.info("user id: {} remove from friends user id: {}", userId, friendId);
+        }
+        if (userRemoved.getFriends().remove(userId)) {
+            log.info("user id: {} remove from friends user id: {}", friendId, userId);
+        }
+        return user;
+    }
+
+    public List<User> getFriends(Long id) {
+        User user = userStorage.getByID(id);
+        if (user == null)
+            throw new UserNotFoundException(id);
+        return userStorage.findAll().stream()
+                .filter(u -> user.getFriends().contains(u.getId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getFriendsCommonOtherUser(Long id, Long otherId) {
+        User user = userStorage.getByID(id);
+        User otherUser = userStorage.getByID(otherId);
+        if (user == null)
+            throw new UserNotFoundException(id);
+        if (otherUser == null)
+            throw new UserNotFoundException(otherId);
+
+        //Получаем ID общих друзей
+        List<Long> commonListFriends = user.getFriends().stream()
+                .filter(aLong -> otherUser.getFriends().contains(aLong))
+                .collect(Collectors.toList());
+
+        return userStorage.findAll().stream()
+                .filter(u -> commonListFriends.contains(u.getId()))
+                .collect(Collectors.toList());
     }
 
     public void validate(User user) {
