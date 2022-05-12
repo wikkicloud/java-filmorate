@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -25,13 +26,13 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.setId(getNextId());
         films.put(film.getId(), film);
         log.info("Добавлен фильм {}", films.get(film.getId()));
-        return films.get(film.getId());
+        return film;
     }
 
     @Override
     public Film update(Film film) {
         films.put(film.getId(), film);
-        return films.get(film.getId());
+        return film;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getByID(Long id) {
-        return films.get(id);
+    public Optional<Film> getByID(Long id) {
+        return Optional.ofNullable(films.get(id));
     }
 }

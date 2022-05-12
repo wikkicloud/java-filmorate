@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -25,13 +26,13 @@ public class InMemoryUserStorage implements UserStorage {
         user.setId(getNextId());
         users.put(user.getId(), user);
         log.info("Добавлен пользователь {}", user);
-        return users.get(user.getId());
+        return user;
     }
 
     @Override
     public User update(User user) {
         users.put(user.getId(), user);
-        return users.get(user.getId());
+        return user;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getByID(Long id) {
-        return users.get(id);
+    public Optional<User> getByID(Long id) {
+        return Optional.ofNullable(users.get(id));
     }
 }

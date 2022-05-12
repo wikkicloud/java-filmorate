@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -25,7 +22,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -36,28 +33,18 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        if (film.getId() == null || filmStorage.getByID(film.getId()) == null) {
-            throw new FilmNotFoundException(film.getId());
-        }
+        filmStorage.getByID(film.getId()).orElseThrow(() -> new FilmNotFoundException(film.getId()));
         validate(film);
         return filmStorage.update(film);
     }
 
     public Film getById(Long id) {
-        Film film = filmStorage.getByID(id);
-        if (film == null)
-            throw new FilmNotFoundException(id);
-        return film;
+        return filmStorage.getByID(id).orElseThrow(() -> new FilmNotFoundException(id));
     }
 
     public Film addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getByID(filmId);
-        User user = userStorage.getByID(userId);
-        if (film == null)
-            throw new FilmNotFoundException(filmId);
-        if (user == null)
-            throw new UserNotFoundException(userId);
-
+        Film film = filmStorage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
+        userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
         //Если добавился like обновим список like у фильма
         if (film.getUsersLiked().add(userId)) {
             log.info("film id: {} add like user id: {}", filmId, userId);
@@ -66,12 +53,8 @@ public class FilmService {
     }
 
     public Film removeLike(Long filmId, Long userId) {
-        Film film = filmStorage.getByID(filmId);
-        User user = userStorage.getByID(userId);
-        if (film == null)
-            throw new FilmNotFoundException(filmId);
-        if (user == null)
-            throw new UserNotFoundException(userId);
+        Film film = filmStorage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
+        userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         //Если лайк убрали, обновим список лайков
         if (film.getUsersLiked().remove(userId)) {

@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -21,7 +19,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
+    public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -35,27 +33,19 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (userStorage.getByID(user.getId()) == null)
-            throw new UserNotFoundException(user.getId());
+        userStorage.getByID(user.getId()).orElseThrow(() -> new UserNotFoundException(user.getId()));
         validate(user);
         return userStorage.update(user);
     }
 
     public User getById(Long id) {
-        User user = userStorage.getByID(id);
-        if (user == null)
-            throw new FilmNotFoundException(id);
-        return user;
+        return userStorage.getByID(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User addFriend(Long userId, Long friendId) {
-        User user = userStorage.getByID(userId);
-        User userAdded = userStorage.getByID(friendId);
+        User user = userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User userAdded = userStorage.getByID(friendId).orElseThrow(() -> new UserNotFoundException(friendId));
 
-        if (user == null)
-            throw new UserNotFoundException(userId);
-        if (userAdded == null)
-            throw new UserNotFoundException(friendId);
         //Если удалось добавить обновим список друзей
         if (user.getFriends().add(friendId)) {
             log.info("user id: {} add friend user id: {}", userId, friendId);
@@ -67,13 +57,8 @@ public class UserService {
     }
 
     public User removeFriend(Long userId, Long friendId) {
-        User user = userStorage.getByID(userId);
-        User userRemoved = userStorage.getByID(friendId);
-
-        if (user == null)
-            throw new UserNotFoundException(userId);
-        if (userRemoved == null)
-            throw new UserNotFoundException(friendId);
+        User user = userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User userRemoved = userStorage.getByID(friendId).orElseThrow(() -> new UserNotFoundException(friendId));
 
         if (user.getFriends().remove(friendId)) {
             log.info("user id: {} remove from friends user id: {}", userId, friendId);
@@ -85,21 +70,15 @@ public class UserService {
     }
 
     public List<User> getFriends(Long id) {
-        User user = userStorage.getByID(id);
-        if (user == null)
-            throw new UserNotFoundException(id);
+        User user = userStorage.getByID(id).orElseThrow(() -> new UserNotFoundException(id));
         return userStorage.findAll().stream()
                 .filter(u -> user.getFriends().contains(u.getId()))
                 .collect(Collectors.toList());
     }
 
     public List<User> getFriendsCommonOtherUser(Long id, Long otherId) {
-        User user = userStorage.getByID(id);
-        User otherUser = userStorage.getByID(otherId);
-        if (user == null)
-            throw new UserNotFoundException(id);
-        if (otherUser == null)
-            throw new UserNotFoundException(otherId);
+        User user = userStorage.getByID(id).orElseThrow(() -> new UserNotFoundException(id));
+        User otherUser = userStorage.getByID(otherId).orElseThrow(() -> new UserNotFoundException(otherId));
 
         //Получаем ID общих друзей
         List<Long> commonListFriends = user.getFriends().stream()
