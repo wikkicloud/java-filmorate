@@ -1,14 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Film {
-    private Long id;
+public class Film extends Entity {
     private String name;
     private String description;
     private LocalDate releaseDate;
