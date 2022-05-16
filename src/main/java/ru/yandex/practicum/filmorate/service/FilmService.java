@@ -37,7 +37,7 @@ public class FilmService extends GenericService<Film> {
     }
 
     public Film removeLike(Long filmId, Long userId) {
-        Film film = super.storage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
+        Film film = storage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
         userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         //Если лайк убрали, обновим список лайков
