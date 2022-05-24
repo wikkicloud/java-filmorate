@@ -2,7 +2,7 @@
 Template repository for Filmorate project.  
 
 ER-diagram  
-![alt text](https://prnt.sc/BARkj9cZSkf7)
+![alt text](./er-diagram.png)
 ##Примеры запросов к БД
 Получить фильм по ID
 ```
