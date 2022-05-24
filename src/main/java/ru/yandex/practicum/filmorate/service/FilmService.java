@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -16,34 +16,18 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class FilmService {
+public class FilmService extends GenericService<Film> {
 
-    private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
+    public FilmService(Storage<Film> storage, UserStorage userStorage) {
+        super(storage);
         this.userStorage = userStorage;
     }
 
-    public Film create(Film film) {
-        validate(film);
-        return filmStorage.create(film);
-    }
-
-    public Film update(Film film) {
-        filmStorage.getByID(film.getId()).orElseThrow(() -> new FilmNotFoundException(film.getId()));
-        validate(film);
-        return filmStorage.update(film);
-    }
-
-    public Film getById(Long id) {
-        return filmStorage.getByID(id).orElseThrow(() -> new FilmNotFoundException(id));
-    }
-
     public Film addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
+        Film film = storage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
         userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
         //Если добавился like обновим список like у фильма
         if (film.getUsersLiked().add(userId)) {
@@ -53,7 +37,7 @@ public class FilmService {
     }
 
     public Film removeLike(Long filmId, Long userId) {
-        Film film = filmStorage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
+        Film film = storage.getByID(filmId).orElseThrow(() -> new FilmNotFoundException(filmId));
         userStorage.getByID(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         //Если лайк убрали, обновим список лайков
@@ -64,16 +48,13 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.findAll().stream()
+        return storage.findAll().stream()
                 .sorted((o1, o2) -> (o1.getUsersLiked().size() - o2.getUsersLiked().size()) * -1)
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    public List<Film> findAll() {
-        return filmStorage.findAll();
-    }
-
+    @Override
     public void validate(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             log.error("Пустое имя фильма");
