@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +22,7 @@ class FilmControllerTest {
     @Test
     void shouldValidationExceptionIsNameBlank() {
         Film film = new Film("", "Описание",
-                LocalDate.of(2001, Month.JANUARY, 2),90L);
+                LocalDate.of(2001, Month.JANUARY, 2),90);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
     @Test
@@ -30,28 +31,28 @@ class FilmControllerTest {
                 " что вызвать сильную скорбь и грусть гораздо сложнее чем улыбку. Для этого нужно проделать большую" +
                 " работу над персонажам";
         Film film = new Film("Фильм", desc201,
-                LocalDate.of(2001, Month.JANUARY, 2), 90L);
+                LocalDate.of(2001, Month.JANUARY, 2), 90);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 
     @Test
     void shouldValidationExceptionIsReleaseDateBeforeMinDateRelease() {
         Film film = new Film("Фильм", "Описание",
-                LocalDate.of(1895, Month.DECEMBER, 27), 90L);
+                LocalDate.of(1895, Month.DECEMBER, 27), 90);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 
     @Test
     void shouldValidationExceptionDescriptionIsBlank() {
         Film film = new Film("Фильм", "",
-                LocalDate.of(1895, Month.DECEMBER, 27), 90L);
+                LocalDate.of(1895, Month.DECEMBER, 27), 90);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 
     @Test
     void shouldValidationExceptionIsDuration0() {
         Film film = new Film("Фильм", "Описание",
-                LocalDate.of(2001, Month.DECEMBER, 27), 0L);
+                LocalDate.of(2001, Month.DECEMBER, 27), 0);
         assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 

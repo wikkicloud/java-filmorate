@@ -26,7 +26,7 @@ public abstract class InMemoryStorage<T extends Entity> implements Storage<T> {
     }
 
     @Override
-    public Optional<T> getByID(Long id) {
+    public Optional<T> getById(Long id) {
         return Optional.ofNullable(data.get(id));
     }
 

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,5 +36,11 @@ public class ErrorHandler {
     public ResponseEntity<String> handleFilmNotFoundException(FilmNotFoundException e) {
         log.error(e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleEmptyResultDataAccessException(EmptyResultDataAccessException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NO_CONTENT);
     }
 }
