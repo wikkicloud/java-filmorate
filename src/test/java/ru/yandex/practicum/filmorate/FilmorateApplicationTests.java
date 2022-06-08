@@ -38,11 +38,9 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void testUpdateUser() {
-		User newUserForUpdate = new User();
+		User newUserForUpdate = new User("light@bulb.clng","moth", null,
+				LocalDate.of(1950, 10, 30));
 		newUserForUpdate.setId(1L);
-		newUserForUpdate.setLogin("moth");
-		newUserForUpdate.setBirthday(LocalDate.of(1950, 10, 30));
-		newUserForUpdate.setEmail("light@bulb.clng");
 		userService.update(newUserForUpdate);
 
 		User updatedUser = userService.getById(1L);
@@ -85,14 +83,9 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void testUpdateFilm() {
-		Film newFilmForUpdate = new Film();
+		Film newFilmForUpdate = new Film("Pulp Fiction", "Classic Tarantino movie",
+				LocalDate.of(1995, 9, 25), 154, new Mpa(1, "G"));
 		newFilmForUpdate.setId(1L);
-		newFilmForUpdate.setName("Pulp Fiction");
-		newFilmForUpdate.setDescription("Classic Tarantino movie");
-		newFilmForUpdate.setDuration(154);
-		newFilmForUpdate.setReleaseDate(LocalDate.of(1995, 9, 25));
-		Mpa mpa = new Mpa(3, "PG-13");
-		newFilmForUpdate.setMpa(mpa);
 		filmService.update(newFilmForUpdate);
 
 		Film updatedFilm = filmService.getById(1L);

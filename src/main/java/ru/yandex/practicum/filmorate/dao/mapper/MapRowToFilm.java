@@ -17,7 +17,8 @@ public class MapRowToFilm implements RowMapper<Film> {
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         Integer duration = rs.getInt("duration");
         Mpa mpa = new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name"));
-
-        return new Film(id, name, description, releaseDate, duration, mpa);
+        Film film = new Film(name, description, releaseDate, duration, mpa);
+        film.setId(id);
+        return film;
     }
 }

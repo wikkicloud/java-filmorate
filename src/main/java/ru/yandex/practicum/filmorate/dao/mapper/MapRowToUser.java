@@ -15,6 +15,8 @@ public class MapRowToUser implements RowMapper<User> {
         String login = rs.getString("login");
         String email = rs.getString("email");
         LocalDate birthday = rs.getDate("birthday").toLocalDate();
-        return new User(id, email, login, name, birthday);
+        User user =  new User(email, login, name, birthday);
+        user.setId(id);
+        return user;
     }
 }
