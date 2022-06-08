@@ -10,5 +10,5 @@ public interface Storage<T> {
 
     List<T> findAll();
 
-    Optional<T> getByID(Long id);
+    Optional<T> getById(Long id);
 }

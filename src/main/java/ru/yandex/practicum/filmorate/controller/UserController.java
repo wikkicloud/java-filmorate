@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FriendService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -17,9 +18,11 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final FriendService friendService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FriendService friendService) {
         this.userService = userService;
+        this.friendService = friendService;
     }
 
     @GetMapping
@@ -34,12 +37,12 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
-        return userService.getFriends(id);
+        return friendService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getFriendsCommonOtherUser(@PathVariable Long id, @PathVariable Long otherId) {
-        return userService.getFriendsCommonOtherUser(id, otherId);
+        return friendService.getFriendsCommonOtherUser(id, otherId);
     }
 
     @PostMapping
@@ -54,12 +57,12 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public User addFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        return userService.addFriend(id, friendId);
+        return friendService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        return userService.removeFriend(id, friendId);
+    public boolean removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        return friendService.removeFriend(id, friendId);
     }
 
 }

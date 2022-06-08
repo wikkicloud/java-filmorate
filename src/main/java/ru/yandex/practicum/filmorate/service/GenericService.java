@@ -24,13 +24,13 @@ abstract class GenericService<T extends Entity> {
     }
 
     public T update(T t) {
-        storage.getByID(t.getId()).orElseThrow(() -> new NotFoundException(t.getId()));
         validate(t);
+        storage.getById(t.getId()).orElseThrow(() -> new NotFoundException(t.getId()));
         return storage.update(t);
     }
 
     public T getById(Long id) {
-        return storage.getByID(id).orElseThrow(() -> new NotFoundException(id));
+        return storage.getById(id).orElseThrow(() -> new NotFoundException(id));
     }
 
     public List<T> findAll() {
